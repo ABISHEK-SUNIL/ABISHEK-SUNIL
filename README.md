@@ -11,59 +11,58 @@ You can click the Preview link to take a look at your changes.
 
        apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
 
-LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-add-apt-repository ppa:redislabs/redis -y
+       LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php add-apt-repository ppa:redislabs/redis -y
 
-curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+       curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
 
-apt update
+              apt update
 
-apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
+       apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
 
-curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+       curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
 
 <!-- Downloading Files-->
-mkdir -p /var/www/jexactyl
-cd /var/www/jexactyl
-curl -Lo panel.tar.gz https://github.com/jexactyl/jexactyl/releases/latest/download/panel.tar.gz
-tar -xzvf panel.tar.gz
-chmod -R 755 storage/* bootstrap/cache/
+       mkdir -p /var/www/jexactyl
+       cd /var/www/jexactyl
+       curl -Lo panel.tar.gz https://github.com/jexactyl/jexactyl/releases/latest/download/panel.tar.gz
+       tar -xzvf panel.tar.gz
+       chmod -R 755 storage/* bootstrap/cache/
 
 <!--Database Setuping-->
-mysql -u root -p
+       mysql -u root -p
 
 # Remember to change 'yourPassword' below to be a unique password
-CREATE USER 'jexactyl'@'127.0.0.1' IDENTIFIED BY 'yourPassword';
-CREATE DATABASE panel;
-GRANT ALL PRIVILEGES ON panel.* TO 'jexactyl'@'127.0.0.1' WITH GRANT OPTION;
-exit
+       CREATE USER 'jexactyl'@'127.0.0.1' IDENTIFIED BY 'yourPassword';
+       CREATE DATABASE panel;
+       GRANT ALL PRIVILEGES ON panel.* TO 'jexactyl'@'127.0.0.1' WITH GRANT OPTION;
+       exit
 
 <!--Environment Setup-->
-cp .env.example .env
+       cp .env.example .env
 
-composer install --no-dev --optimize-autoloader
+       composer install --no-dev --optimize-autoloader
 
-php artisan key:generate --force
+       php artisan key:generate --force
 
-php artisan p:environment:setup
-php artisan p:environment:database
-php artisan p:environment:mail # Not required to run the Panel.
+       php artisan p:environment:setup
+       php artisan p:environment:database
+       php artisan p:environment:mail # Not required to run the Panel.
 
-php artisan migrate --seed --force
+       php artisan migrate --seed --force
 
-php artisan p:user:make
+       php artisan p:user:make
 
 # If using NGINX or Apache (not on CentOS):
-chown -R www-data:www-data /var/www/jexactyl/*
+       chown -R www-data:www-data /var/www/jexactyl/*
 
 # If using NGINX on CentOS:
-chown -R nginx:nginx /var/www/jexactyl/*
+       chown -R nginx:nginx /var/www/jexactyl/*
 
 # If using Apache on CentOS:
-chown -R apache:apache /var/www/jexactyl/*
+       chown -R apache:apache /var/www/jexactyl/*
 
 <!--Queue Workers-->
-* * * * * php /var/www/jexactyl/artisan schedule:run >> /dev/null 2>&1
+       * * * * * php /var/www/jexactyl/artisan schedule:run >> /dev/null 2>&1
        
 <!--Now setup Queue do not miss this one Importent-->
 # Jexactyl Queue Worker File
