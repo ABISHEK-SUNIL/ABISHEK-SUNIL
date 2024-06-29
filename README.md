@@ -9,7 +9,7 @@ You can click the Preview link to take a look at your changes.
 --->
 <!--Install Dependencies-->
 
-apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
+"apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg"
 
 LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
 add-apt-repository ppa:redislabs/redis -y
