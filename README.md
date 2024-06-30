@@ -11,11 +11,19 @@ You can click the Preview link to take a look at your changes.
 
        apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
 
+.
+
        LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php add-apt-repository ppa:redislabs/redis -y
 
+.
+ 
        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
 
+.
+
        apt update
+
+.
 
        apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
 
@@ -24,9 +32,17 @@ You can click the Preview link to take a look at your changes.
 # Create Directory
 <!-- Downloading Files-->
        mkdir -p /var/www/jexactyl
+.
+
        cd /var/www/jexactyl
+.
+ 
        curl -Lo panel.tar.gz https://github.com/jexactyl/jexactyl/releases/latest/download/panel.tar.gz
+.
+
        tar -xzvf panel.tar.gz
+.
+
        chmod -R 755 storage/* bootstrap/cache/
 
 # Database Setuping
@@ -42,17 +58,28 @@ You can click the Preview link to take a look at your changes.
 # Environment Setup
 
 <!--Environment Setup-->
-       cp .env.example .env
+    cp .env.example .env
 
-       composer install --no-dev --optimize-autoloader
+.
 
+    composer install --no-dev --optimize-autoloader
+
+.
+       
        php artisan key:generate --force
+.
 
        php artisan p:environment:setup
-       php artisan p:environment:database
-       php artisan p:environment:mail # Not required to run the Panel.
+.
 
+       php artisan p:environment:database
+.
+       
+       php artisan p:environment:mail # Not required to run the Panel.
+.
+ 
        php artisan migrate --seed --force
+.
 
        php artisan p:user:make
 
@@ -94,6 +121,8 @@ You can click the Preview link to take a look at your changes.
 # Enable Queue Workers
 <!--Next cmd for setuping-->
        sudo systemctl enable --now panel.service
+ .
+ 
        sudo systemctl enable --now redis-server
 
 <!--Setup SSL with Certbot-->
@@ -181,7 +210,9 @@ You can click the Preview link to take a look at your changes.
 # Enabling Configuration
 
        ln -s /etc/nginx/sites-available/panel.conf /etc/nginx/sites-enabled/panel.conf
+.
 
        nginx -t
+.
 
        systemctl restart nginx
