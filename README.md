@@ -15,12 +15,13 @@ You can click the Preview link to take a look at your changes.
 
        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
 
-              apt update
+       apt update
 
        apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
 
        curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
-
+       
+# Create Directory
 <!-- Downloading Files-->
        mkdir -p /var/www/jexactyl
        cd /var/www/jexactyl
@@ -28,7 +29,8 @@ You can click the Preview link to take a look at your changes.
        tar -xzvf panel.tar.gz
        chmod -R 755 storage/* bootstrap/cache/
 
-<!--Database Setuping-->
+# Database Setuping
+
        mysql -u root -p
 
 # Remember to change 'yourPassword' below to be a unique password
@@ -36,6 +38,8 @@ You can click the Preview link to take a look at your changes.
        CREATE DATABASE panel;
        GRANT ALL PRIVILEGES ON panel.* TO 'jexactyl'@'127.0.0.1' WITH GRANT OPTION;
        exit
+
+# Environment Setup
 
 <!--Environment Setup-->
        cp .env.example .env
@@ -53,6 +57,7 @@ You can click the Preview link to take a look at your changes.
        php artisan p:user:make
 
 # If using NGINX or Apache (not on CentOS):
+
        chown -R www-data:www-data /var/www/jexactyl/*
 
 # If using NGINX on CentOS:
@@ -61,49 +66,51 @@ You can click the Preview link to take a look at your changes.
 # If using Apache on CentOS:
        chown -R apache:apache /var/www/jexactyl/*
 
+# -Queue Workers
 <!--Queue Workers-->
        * * * * * php /var/www/jexactyl/artisan schedule:run >> /dev/null 2>&1
-       
+
+# Now setup Queue do not miss this one Important
 <!--Now setup Queue do not miss this one Importent-->
-# Jexactyl Queue Worker File
-# ----------------------------------
 
-[Unit]
-Description=Jexactyl Queue Worker
+       [Unit]
+       Description=Jexactyl Queue Worker
 
-[Service]
-User=www-data
-Group=www-data
-Restart=always
-ExecStart=/usr/bin/php /var/www/jexactyl/artisan queue:work --queue=high,standard,low --sleep=3 --tries=3
-StartLimitInterval=180
-StartLimitBurst=30
-RestartSec=5s
+       [Service]
+       User=www-data
+       Group=www-data
+       Restart=always
+       ExecStart=/usr/bin/php /var/www/jexactyl/artisan queue:work --queue=high,standard,low --sleep=3 --tries=3
+       StartLimitInterval=180
+       StartLimitBurst=30
+       RestartSec=5s
 
-[Install]
-WantedBy=multi-user.target
+       [Install]
+       WantedBy=multi-user.target
 
+# Enable Queue Workers
 <!--Next cmd for setuping-->
-sudo systemctl enable --now panel.service
-sudo systemctl enable --now redis-server
+       sudo systemctl enable --now panel.service
+       sudo systemctl enable --now redis-server
 
 <!--Setup SSL with Certbot-->
 # If using NGINX run the following:
-apt install -y certbot python3-certbot-nginx
+       apt install -y certbot python3-certbot-nginx
 
 # If you are using NGINX:
-certbot certonly --nginx -d <domain>
+       certbot certonly --nginx -d <domain>
 
+# Nginx with SSL Configuration
 <!--Nginx with SSL Configuration-->
 
 rm /etc/nginx/sites-available/default; rm /etc/nginx/sites-enabled/default
 
 <!--Setting up Make a file called panel.conf in /etc/nginx/sites-available-->
-server {
-    listen 80;
-    server_name <domain>;
-    return 301 https://$server_name$request_uri;
-}
+       server {
+       listen 80;
+       server_name <domain>;
+       return 301 https://$server_name$request_uri;
+       }
 
 server {
     listen 443 ssl http2;
