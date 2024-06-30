@@ -231,4 +231,14 @@ Before wings installation configure your database domain with cloudflare 2ndary 
 
     bash <(curl -s https://pterodactyl-installer.se)
 
+# After wings installation setup phpmyadmin
+
+    sudo apt update
+.
+
+    sudo apt install phpmyadmin
+.
+
+# Use the folllowing cmds and setup your jexactyl at last link your database with the jexactyl panel
+    
   
