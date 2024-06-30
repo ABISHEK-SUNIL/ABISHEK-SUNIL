@@ -217,3 +217,12 @@ You can click the Preview link to take a look at your changes.
 .
 
     systemctl restart nginx
+
+# Daemon installation wings
+
+# Select 1 only for wings installation
+Before wings installation configure your database domain with cloudflare 2ndary domain
+
+    bash <(curl -s https://pterodactyl-installer.se)
+
+  
