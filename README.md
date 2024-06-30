@@ -2,59 +2,59 @@
 
 This Installation method is customised and installed according to my idea and its working
 if your getting any error and trouble please make sure your insttalled according to my script
-so if your having any trouble contact me on discord .
+so if your having any trouble contact me on discord.
 <!---
 ABISHEK-SUNIL/ABISHEK-SUNIL is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 You can click the Preview link to take a look at your changes.
 --->
 <!--Install Dependencies-->
 
-       apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
+    apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
 
 .
 
-       LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php add-apt-repository ppa:redislabs/redis -y
+    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php add-apt-repository ppa:redislabs/redis -y
 
 .
  
-       curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+    curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
 
 .
 
-       apt update
+    apt update
 
 .
 
-       apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
+    apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
 .
 
-       curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+    curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
        
 # Create Directory
 <!-- Downloading Files-->
-       mkdir -p /var/www/jexactyl
+    mkdir -p /var/www/jexactyl
 .
 
-       cd /var/www/jexactyl
+    cd /var/www/jexactyl
 .
  
-       curl -Lo panel.tar.gz https://github.com/jexactyl/jexactyl/releases/latest/download/panel.tar.gz
+    curl -Lo panel.tar.gz https://github.com/jexactyl/jexactyl/releases/latest/download/panel.tar.gz
 .
 
-       tar -xzvf panel.tar.gz
+    tar -xzvf panel.tar.gz
 .
 
-       chmod -R 755 storage/* bootstrap/cache/
+    chmod -R 755 storage/* bootstrap/cache/
 
 # Database Setuping
 
-       mysql -u root -p
+    mysql -u root -p
 
 # Remember to change 'yourPassword' below to be a unique password
-       CREATE USER 'jexactyl'@'127.0.0.1' IDENTIFIED BY 'yourPassword';
-       CREATE DATABASE panel;
-       GRANT ALL PRIVILEGES ON panel.* TO 'jexactyl'@'127.0.0.1' WITH GRANT OPTION;
-       exit
+    CREATE USER 'jexactyl'@'127.0.0.1' IDENTIFIED BY 'yourPassword';
+    CREATE DATABASE panel;
+    GRANT ALL PRIVILEGES ON panel.* TO 'jexactyl'@'127.0.0.1' WITH GRANT OPTION;
+    exit
 
 # Environment Setup
 
@@ -67,89 +67,89 @@ You can click the Preview link to take a look at your changes.
 
 .
        
-       php artisan key:generate --force
+    php artisan key:generate --force
 .
 
-       php artisan p:environment:setup
+    php artisan p:environment:setup
 .
 
-       php artisan p:environment:database
+    php artisan p:environment:database
 .
        
-       php artisan p:environment:mail # Not required to run the Panel.
+    php artisan p:environment:mail # Not required to run the Panel.
 .
  
-       php artisan migrate --seed --force
+    php artisan migrate --seed --force
 .
 
-       php artisan p:user:make
+    php artisan p:user:make
 
 # If using NGINX or Apache (not on CentOS):
 
-       chown -R www-data:www-data /var/www/jexactyl/*
+    chown -R www-data:www-data /var/www/jexactyl/*
 
 # If using NGINX on CentOS:
-       chown -R nginx:nginx /var/www/jexactyl/*
+    chown -R nginx:nginx /var/www/jexactyl/*
 
 # If using Apache on CentOS:
-       chown -R apache:apache /var/www/jexactyl/*
+    chown -R apache:apache /var/www/jexactyl/*
 
 # -Queue Workers
 <!--Queue Workers-->
-       * * * * * php /var/www/jexactyl/artisan schedule:run >> /dev/null 2>&1
+    * * * * * php /var/www/jexactyl/artisan schedule:run >> /dev/null 2>&1
 
 # Now setup Queue do not miss this one Important
 <!--Now setup Queue do not miss this one Importent-->
 
-       nano /etc/systemd/system/panel.service
+    nano /etc/systemd/system/panel.service
 .
 
-       [Unit]
-       Description=Jexactyl Queue Worker
+    [Unit]
+    Description=Jexactyl Queue Worker
 
-       [Service]
-       User=www-data
-       Group=www-data
-       Restart=always
-       ExecStart=/usr/bin/php /var/www/jexactyl/artisan queue:work --queue=high,standard,low --sleep=3 --tries=3
-       StartLimitInterval=180
-       StartLimitBurst=30
-       RestartSec=5s
+    [Service]
+    User=www-data
+    Group=www-data
+    Restart=always
+    ExecStart=/usr/bin/php /var/www/jexactyl/artisan queue:work --queue=high,standard,low --sleep=3 --tries=3
+    StartLimitInterval=180
+    StartLimitBurst=30
+    RestartSec=5s
 
-       [Install]
-       WantedBy=multi-user.target
+    [Install]
+    WantedBy=multi-user.target
 
 # Enable Queue Workers
 <!--Next cmd for setuping-->
-       sudo systemctl enable --now panel.service
+    sudo systemctl enable --now panel.service
  .
  
-       sudo systemctl enable --now redis-server
+    sudo systemctl enable --now redis-server
 
 <!--Setup SSL with Certbot-->
 # If using NGINX run the following:
-       apt install -y certbot python3-certbot-nginx
+    apt install -y certbot python3-certbot-nginx
 
 # If you are using NGINX:
-       certbot certonly --nginx -d <domain>
+    certbot certonly --nginx -d <domain>
 
 # Remove default configuration
 <!--Nginx with SSL Configuration-->
 
-       rm /etc/nginx/sites-available/default; rm /etc/nginx/sites-enabled/default
+    rm /etc/nginx/sites-available/default; rm /etc/nginx/sites-enabled/default
 
 # Create configuration file
 <!--Setting up Make a file called panel.conf in /etc/nginx/sites-available-->
 
-       nano /etc/nginx/sites-available/panel.conf
+    nano /etc/nginx/sites-available/panel.conf
 
  .
  
-       server {
-       listen 80;
-       server_name <domain>;
-       return 301 https://$server_name$request_uri;
-       }
+    server {
+    listen 80;
+    server_name <domain>;
+    return 301 https://$server_name$request_uri;
+    }
 
     server {
     listen 443 ssl http2;
@@ -210,10 +210,10 @@ You can click the Preview link to take a look at your changes.
 
 # Enabling Configuration
 
-       ln -s /etc/nginx/sites-available/panel.conf /etc/nginx/sites-enabled/panel.conf
+    ln -s /etc/nginx/sites-available/panel.conf /etc/nginx/sites-enabled/panel.conf
 .
 
-       nginx -t
+    nginx -t
 .
 
-       systemctl restart nginx
+    systemctl restart nginx
