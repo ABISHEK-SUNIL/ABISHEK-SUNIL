@@ -73,6 +73,9 @@ You can click the Preview link to take a look at your changes.
 # Now setup Queue do not miss this one Important
 <!--Now setup Queue do not miss this one Importent-->
 
+       nano /etc/systemd/system/panel.service
+.
+
        [Unit]
        Description=Jexactyl Queue Worker
 
@@ -100,19 +103,25 @@ You can click the Preview link to take a look at your changes.
 # If you are using NGINX:
        certbot certonly --nginx -d <domain>
 
-# Nginx with SSL Configuration
+# Remove default configuration
 <!--Nginx with SSL Configuration-->
 
-rm /etc/nginx/sites-available/default; rm /etc/nginx/sites-enabled/default
+       rm /etc/nginx/sites-available/default; rm /etc/nginx/sites-enabled/default
 
+# Create configuration file
 <!--Setting up Make a file called panel.conf in /etc/nginx/sites-available-->
+
+       nano /etc/nginx/sites-available/panel.conf
+
+ .
+ 
        server {
        listen 80;
        server_name <domain>;
        return 301 https://$server_name$request_uri;
        }
 
-server {
+    server {
     listen 443 ssl http2;
     server_name <domain>;
 
@@ -167,11 +176,12 @@ server {
     location ~ /\.ht {
         deny all;
     }
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    }
 
-ln -s /etc/nginx/sites-available/panel.conf /etc/nginx/sites-enabled/panel.conf
+# Enabling Configuration
 
-nginx -t
+       ln -s /etc/nginx/sites-available/panel.conf /etc/nginx/sites-enabled/panel.conf
 
-systemctl restart nginx
+       nginx -t
+
+       systemctl restart nginx
